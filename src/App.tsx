@@ -1201,7 +1201,7 @@ function App() {
                 <div className="flex items-start space-x-3">
                   <MapPin className="h-5 w-5 mt-1" />
                   <span>
-                    Centro Cristiano El Refugio
+                    Dirección del lugar
                     <br />
                     Av. Principal #123
                     <br />
@@ -1214,8 +1214,7 @@ function App() {
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
             <p>
-              &copy; 2025 Conferencitas. Todos los derechos reservados. Hecho
-              con ❤️ para los niños.
+              &copy; 2025 Conferencitas. Todos los derechos reservados.
             </p>
           </div>
         </div>
