@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import "./index.css";
 import {
   Heart,
   Star,
@@ -234,35 +235,35 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-gray-900">
-                <span className="text-gradient bg-gradient-to-r from-blue-600 to-purple-600">
+              <span className="text-3xl font-bold text-gray-900">
+                <h1 className="text-gradient bg-gradient-to-r from-blue-600 to-purple-600 titles">
                   Conferencitas
-                </span>
+                </h1>
               </span>
             </div>
 
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-8 text-xl">
               <button
                 onClick={() => scrollToSection("inicio")}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium hover:animate-bounce"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold hover:animate-bounce"
               >
                 Inicio
               </button>
               <button
                 onClick={() => scrollToSection("sobre")}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium hover:animate-bounce"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold hover:animate-bounce"
               >
                 Sobre el Evento
               </button>
               <button
                 onClick={() => scrollToSection("actividades")}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium hover:animate-bounce"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold hover:animate-bounce"
               >
                 Actividades
               </button>
               <button
                 onClick={() => scrollToSection("inscripcion")}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium hover:animate-bounce"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold hover:animate-bounce"
               >
                 Inscripción
               </button>
@@ -345,7 +346,7 @@ function App() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-                <span className="text-gradient bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+                <span className="text-gradient bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 titles">
                   Conferencitas
                 </span>
                 <br />
@@ -416,11 +417,11 @@ function App() {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               ¿Qué son las{" "}
-              <span className="text-gradient bg-gradient-to-r from-blue-600 to-purple-600">
+              <span className="text-gradient bg-gradient-to-r from-blue-600 to-purple-600 titles">
                 Conferencitas?
               </span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto font-bold">
               Las Conferencitas son eventos especiales donde los niños descubren
               el amor de Dios de manera divertida y educativa, creando recuerdos
               inolvidables mientras fortalecen su fe.
@@ -538,8 +539,8 @@ function App() {
                 Evento
               </span>
             </h2>
-            <p className="text-lg text-gray-600">
-              Todo lo que necesitas saber sobre las Conferencitas 2025
+            <p className="text-xl text-gray-600 font-medium">
+              Todo lo que necesitas saber sobre las <span className="titles text-gradient bg-gradient-to-r from-blue-600 to-purple-600">Conferencitas 2025</span>
             </p>
           </div>
 
@@ -611,7 +612,7 @@ function App() {
               </span>
             </h3>
             <div className="space-y-4">
-              <div className="flex items-start bg-blue-50/50 p-4 rounded-lg border-l-4 border-blue-500">
+              <div className="flex items-start bg-blue-50/50 p-4 rounded-lg border-l-4 border-blue-500 transition-transform duration-300 hover:scale-105">
                 <div className="w-24 flex-shrink-0 font-medium text-blue-700">
                   9:00 AM
                 </div>
@@ -624,7 +625,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-purple-50/50 p-4 rounded-lg border-l-4 border-purple-500">
+              <div className="flex items-start bg-purple-50/50 p-4 rounded-lg border-l-4 border-purple-500 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-purple-700">
                   9:30 AM
                 </div>
@@ -638,7 +639,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-green-50/50 p-4 rounded-lg border-l-4 border-green-500">
+              <div className="flex items-start bg-green-50/50 p-4 rounded-lg border-l-4 border-green-500 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-green-700">
                   10:00 AM
                 </div>
@@ -651,7 +652,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-yellow-50/50 p-4 rounded-lg border-l-4 border-yellow-500">
+              <div className="flex items-start bg-yellow-50/50 p-4 rounded-lg border-l-4 border-yellow-500 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-yellow-700">
                   11:00 AM
                 </div>
@@ -662,7 +663,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-pink-50/50 p-4 rounded-lg border-l-4 border-pink-500">
+              <div className="flex items-start bg-pink-50/50 p-4 rounded-lg border-l-4 border-pink-500 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-pink-700">
                   12:00 PM
                 </div>
@@ -673,7 +674,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-indigo-50/50 p-4 rounded-lg border-l-4 border-indigo-500">
+              <div className="flex items-start bg-indigo-50/50 p-4 rounded-lg border-l-4 border-indigo-500 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-indigo-700">
                   1:00 PM
                 </div>
@@ -686,7 +687,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-red-50/50 p-4 rounded-lg border-l-4 border-red-500">
+              <div className="flex items-start bg-red-50/50 p-4 rounded-lg border-l-4 border-red-500 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-red-700">
                   2:30 PM
                 </div>
@@ -697,7 +698,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-teal-50/50 p-4 rounded-lg border-l-4 border-teal-500">
+              <div className="flex items-start bg-teal-50/50 p-4 rounded-lg border-l-4 border-teal-500 transition-transform duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-teal-700">
                   3:00 PM
                 </div>
@@ -710,7 +711,7 @@ function App() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start bg-orange-50/50 p-4 rounded-lg border-l-4 border-orange-500">
+              <div className="flex items-start bg-orange-50/50 p-4 rounded-lg border-l-4 border-orange-500 transition-all duration-300 hover:scale-105 hover:shadow-lg">
                 <div className="w-24 flex-shrink-0 font-medium text-orange-700">
                   3:30 PM
                 </div>
@@ -1117,9 +1118,9 @@ function App() {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-2 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <Heart className="h-6 w-6 text-white" />
-                </div>
+                </div> */}
                 <span className="text-xl font-bold">Conferencitas</span>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
@@ -1213,9 +1214,7 @@ function App() {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>
-              &copy; 2025 Conferencitas. Todos los derechos reservados.
-            </p>
+            <p>&copy; 2025 Conferencitas. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>

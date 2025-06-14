@@ -1,3 +1,15 @@
+/* TIPOGRAFÍAS */
+@import url("https://fonts.googleapis.com/css2?family=Chewy&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+* {
+  font-family: "Comic Neue", cursive;
+}
+
+.titles {
+  font-family: "Chewy", cursive !important;
+}
