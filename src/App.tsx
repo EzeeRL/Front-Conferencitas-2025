@@ -18,7 +18,7 @@ import {
   BookOpen,
   Gamepad2,
 } from "lucide-react";
-
+import axios from "axios";
 interface RegistrationForm {
   childName: string;
   childAge: string;
@@ -175,19 +175,28 @@ function App() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simulate registration process
-    setTimeout(() => {
-      setIsRegistered(true);
-    }, 1000);
-  };
-
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     element?.scrollIntoView({ behavior: "smooth" });
     setIsMenuOpen(false);
   };
+
+
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+     e.preventDefault();
+  try {
+    console.log(formData)
+    const response = await axios.post("https://conferencita.vercel.app/api/registrar", formData);
+
+    if (response.status === 200) {
+      setIsRegistered(true); // ✅ se registró correctamente
+      console.log("Formulario enviado correctamente");
+    }
+  } catch (error) {
+    console.error("Error al enviar el formulario:", error);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
