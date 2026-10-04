@@ -76,7 +76,7 @@ function Home() {
               duration: Math.random() * 3000 + 2000,
               easing: "cubic-bezier(0.1, 0.8, 0.3, 1)",
               fill: "forwards",
-            }
+            },
           );
 
           animation.onfinish = () => particle.remove();
@@ -141,7 +141,7 @@ function Home() {
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value, type, checked } = e.target;
 
@@ -204,14 +204,14 @@ function Home() {
 
       const response = await axios.post(
         "https://conferencitas-back-final.vercel.app/api/inscripciones",
-        payload
+        payload,
       );
 
       if (response.status === 201) {
         setIsRegistered(true);
         let resta = response.data.id - 271;
-        console.log(resta)
-        setId(resta)
+        console.log(resta);
+        setId(resta);
         console.log(response.data.id);
       }
     } catch (error) {
@@ -300,7 +300,8 @@ function Home() {
                         htmlFor="responsibleName"
                         className="block text-lg font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors"
                       >
-                        Apellido y Nombre de el/los responsable/s. Si es más de uno, ingresarlo en este mismo campo*
+                        Apellido y Nombre de el/los responsable/s. Si es más de
+                        uno, ingresarlo en este mismo campo*
                       </label>
                       <input
                         type="text"
@@ -319,7 +320,8 @@ function Home() {
                         htmlFor="responsiblePhone"
                         className="block text-lg font-medium text-gray-700 mb-2 group-hover:text-purple-600 transition-colors"
                       >
-                        Número de celular de el/los responsable/s. Si es más de uno, ingresarlo en este mismo campo*
+                        Número de celular de el/los responsable/s. Si es más de
+                        uno, ingresarlo en este mismo campo*
                       </label>
                       <input
                         type="tel"
@@ -382,7 +384,7 @@ function Home() {
                   <div className="mb-6 group">
                     <label className="block text-lg font-medium text-gray-700 mb-4 group-hover:text-blue-600 transition-colors">
                       Seleccioná a qué plenaria va a asistir (puede ser más de
-                      una), recordá que el precio de cada plenaria es de $1.000
+                      una), recordá que el precio de cada plenaria es de $2.000
                       por niño/a *
                     </label>
 
@@ -467,10 +469,20 @@ function Home() {
                   </b>{" "}
                   que presente una captura o diga este número a los
                   recepcionistas el día de la conferencia. <br />
-                  <b><u>Con el mismo número deberá retirar al niño/a. </u></b><br />
-                  <b className="text-4xl">
-                    <u>{id}</u>
+                  <b>
+                    <br />
+                    <b className="text-8xl">{id}</b>
+                    <br />
+                    <u>
+                      Es OBLIGATORIO que PRESENTE el mismo número al retirar al
+                      niño/a. Ya sea en una captura de pantalla o en un papel
+                      físico que se le entregue al ingreso de las
+                      conferencitas.{" "}
+                    </u>
                   </b>
+                  <br />
+                  <br />
+                  El abono por la merienda se realiza al ingreso de cada sección, ya sea en efectivo o por transferencia
                 </h1>
               </div>
             )}

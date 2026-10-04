@@ -13,7 +13,7 @@ interface Inscripcion {
   condicion_medica: boolean;
   detalle_condicion?: string;
   plenaria: string; // "plenaria1,plenaria2"
-  pago: boolean;
+  pago: boolean | number;
   asistio_plenaria1?: boolean;
   asistio_plenaria2?: boolean;
   asistio_plenaria3?: boolean;
@@ -35,6 +35,14 @@ const Entrada: React.FC = () => {
   >("");
   const [modalEdadOpen, setModalEdadOpen] = useState(false);
   const [nuevaEdad, setNuevaEdad] = useState<number | "">("");
+  const [modalPagoOpen, setModalPagoOpen] = useState(false);
+  const [plenariasPagadas, setPlenariasPagadas] = useState<number[]>([]);
+  const PRECIO_PLENARIA = 2000;
+  const [modalVerOpen, setModalVerOpen] = useState(false);
+  const [modalSalidaOpen, setModalSalidaOpen] = useState(false);
+  const [modalNombreOpen, setModalNombreOpen] = useState(false);
+  const [nuevoNombre, setNuevoNombre] = useState("");
+  const [nuevoApellido, setNuevoApellido] = useState("");
 
   useEffect(() => {
     fetchInscripciones();
@@ -72,6 +80,8 @@ const Entrada: React.FC = () => {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
+  const getDisplayId = (id: number) => id - 273;
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = normalizeText(e.target.value);
     setSearchId(e.target.value);
@@ -87,7 +97,7 @@ const Entrada: React.FC = () => {
       const soloApellido = normalizeText(i.apellido_chico);
 
       const matchesSearch =
-        i.id.toString() === value ||
+        getDisplayId(i.id).toString() === value ||
         nombreCompleto.includes(value) ||
         nombreInvertido.includes(value) ||
         soloNombre.includes(value) ||
@@ -121,7 +131,7 @@ const Entrada: React.FC = () => {
       const valueNormalized = normalizeText(searchId);
 
       const matchesSearch =
-        i.id.toString() === valueNormalized ||
+        getDisplayId(i.id).toString() === valueNormalized ||
         nombreCompleto.includes(valueNormalized) ||
         nombreInvertido.includes(valueNormalized) ||
         soloNombre.includes(valueNormalized) ||
@@ -203,37 +213,113 @@ const Entrada: React.FC = () => {
     }
   };
 
-  const toggleSalida = async (
-    id: number,
-    nombre: string,
-    salioActual: boolean
-  ) => {
-    const confirmar = window.confirm(
-      `¿Seguro que querés marcar a ${nombre} como ${
-        salioActual ? "NO salió" : "SALIDO"
-      }?`
+  const openModalPago = (inscripcion: Inscripcion) => {
+    setSelectedInscripcion(inscripcion);
+    setPlenariasModal(
+      inscripcion.plenaria
+        .split(",")
+        .map((p) => parseInt(p.replace("plenaria", "")))
     );
-    if (!confirmar) return;
+    setPlenariasPagadas([]);
+    setModalPagoOpen(true);
+  };
+
+  const togglePlenariaPagada = (num: number) => {
+    setPlenariasPagadas((prev) =>
+      prev.includes(num) ? prev.filter((n) => n !== num) : [...prev, num]
+    );
+  };
+
+  const confirmarPago = async () => {
+    if (!selectedInscripcion) return;
+    const pago = plenariasPagadas.length * PRECIO_PLENARIA;
+    try {
+      await axios.patch(
+        `https://conferencitas-back-final.vercel.app/api/inscripciones/pago/${selectedInscripcion.id}`,
+        { pago }
+      );
+
+      const actualizar = (prev: Inscripcion[]) =>
+        prev.map((ins) =>
+          ins.id === selectedInscripcion.id ? { ...ins, pago } : ins
+        );
+      setInscripciones(actualizar);
+      setFiltered(actualizar);
+
+      setModalPagoOpen(false);
+      setSelectedInscripcion(null);
+    } catch (error) {
+      console.error("Error al registrar pago:", error);
+      alert("Error al registrar el pago.");
+    }
+  };
+
+  const openModalNombre = (inscripcion: Inscripcion) => {
+    setSelectedInscripcion(inscripcion);
+    setNuevoNombre(inscripcion.nombre_chico);
+    setNuevoApellido(inscripcion.apellido_chico);
+    setModalNombreOpen(true);
+  };
+
+  const guardarNombre = async () => {
+    if (!selectedInscripcion) return;
+    const nombre_chico = nuevoNombre.trim();
+    const apellido_chico = nuevoApellido.trim();
+    if (!nombre_chico && !apellido_chico) {
+      alert("Ingresá un nombre o apellido válido.");
+      return;
+    }
+    try {
+      await axios.patch(
+        `https://conferencitas-back-final.vercel.app/api/inscripciones/nombre/${selectedInscripcion.id}`,
+        { nombre_chico, apellido_chico }
+      );
+
+      // el back ignora los campos vacíos, así que acá también
+      const actualizar = (prev: Inscripcion[]) =>
+        prev.map((ins) =>
+          ins.id === selectedInscripcion.id
+            ? {
+                ...ins,
+                nombre_chico: nombre_chico || ins.nombre_chico,
+                apellido_chico: apellido_chico || ins.apellido_chico,
+              }
+            : ins
+        );
+      setInscripciones(actualizar);
+      setFiltered(actualizar);
+
+      setModalNombreOpen(false);
+      setSelectedInscripcion(null);
+    } catch (error) {
+      console.error("Error al actualizar nombre:", error);
+      alert("Error al actualizar nombre.");
+    }
+  };
+
+  const openModalSalida = (inscripcion: Inscripcion) => {
+    setSelectedInscripcion(inscripcion);
+    setModalSalidaOpen(true);
+  };
+
+  const confirmarSalida = async () => {
+    if (!selectedInscripcion) return;
+    const { id } = selectedInscripcion;
 
     try {
-      const nuevoValor = !salioActual;
+      const nuevoValor = !selectedInscripcion.salio;
       await axios.patch(
         `https://conferencitas-back-final.vercel.app/api/inscripciones/salio/${id}`,
         { salio: nuevoValor }
       );
 
-      setInscripciones((prev) =>
-        prev.map((ins) => (ins.id === id ? { ...ins, salio: nuevoValor } : ins))
-      );
-      setFiltered((prev) =>
-        prev.map((ins) => (ins.id === id ? { ...ins, salio: nuevoValor } : ins))
-      );
+      const actualizar = (prev: Inscripcion[]) =>
+        prev.map((ins) => (ins.id === id ? { ...ins, salio: nuevoValor } : ins));
+      setInscripciones(actualizar);
+      setFiltered(actualizar);
 
-      alert(
-        `Ahora ${nombre} está marcado como ${
-          nuevoValor ? "SALIDO" : "NO salió"
-        }.`
-      );
+      setModalSalidaOpen(false);
+      setSelectedInscripcion(null);
     } catch (error) {
       console.error("Error al cambiar salida:", error);
       alert("Error al actualizar salida.");
@@ -268,7 +354,7 @@ const Entrada: React.FC = () => {
       <p className="text-xl font-semibold mb-4 text-center text-green-600">
         <u>Total de inscriptos: {inscripciones.length}</u>
       </p>
-      <p className="text-xl font-semibold mb-4 text-center text-blue-600">
+{/*       <p className="text-xl font-semibold mb-4 text-center text-blue-600">
         <u>
           Total que ingresaron
           {selectedPlenariaFilter
@@ -276,7 +362,7 @@ const Entrada: React.FC = () => {
             : " (todas las plenarias)"}
           : {totalIngresaron}
         </u>
-      </p>
+      </p> */}
       <div className="mb-6 text-center flex flex-col md:flex-row justify-center gap-4">
         <input
           type="text"
@@ -300,20 +386,20 @@ const Entrada: React.FC = () => {
 
       {/* Contenedor de scroll horizontal solo para la tabla */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300 min-w-[900px]">
+        <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
               <th className="border border-gray-300 px-3 py-2">ID</th>
               <th className="border border-gray-300 px-3 py-2">Niño/a</th>
               <th className="border border-gray-300 px-3 py-2">Edad</th>
-              <th className="border border-gray-300 px-3 py-2">
-                Condición médica
+              <th className="border border-gray-300 px-3 py-2 text-center">
+                Datos
               </th>
-              <th className="border border-gray-300 px-3 py-2">Responsable</th>
-              <th className="border border-gray-300 px-3 py-2">Celular</th>
-              <th className="border border-gray-300 px-3 py-2">Plenaria</th>
               <th className="border border-gray-300 px-3 py-2 text-center">
                 Ingreso
+              </th>
+              <th className="border border-gray-300 px-3 py-2 text-center">
+                Pago
               </th>
               <th className="border border-gray-300 px-3 py-2 text-center">
                 Salida
@@ -343,9 +429,17 @@ const Entrada: React.FC = () => {
                     return "hover:bg-gray-300 hover:border-gray-700";
                   })()}`}
                 >
-                  <td className="border border-gray-300 px-3 py-2">{ins.id}</td>
+                  <td className="border border-gray-300 px-3 py-2">
+                    {getDisplayId(ins.id)}
+                  </td>
                   <td className="border border-gray-300 px-3 py-2">
                     {ins.apellido_chico} {ins.nombre_chico}
+                    <button
+                      className="ml-2 px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      onClick={() => openModalNombre(ins)}
+                    >
+                      ✏️
+                    </button>
                   </td>
                   <td className="border border-gray-300 px-3 py-2">
                     {ins.edad}
@@ -361,49 +455,56 @@ const Entrada: React.FC = () => {
                     </button>
                   </td>
 
-                  <td className="border border-gray-300 px-3 py-2">
-                    {ins.condicion_medica
-                      ? ins.detalle_condicion || "Sí"
-                      : "No"}
-                  </td>
-                  <td className="border border-gray-300 px-3 py-2">
-                    {ins.apellido_responsable} {ins.nombre_responsable}
-                  </td>
-                  <td className="border border-gray-300 px-3 py-2">
-                    {ins.celular_responsable}
-                  </td>
-                  <td className="border border-gray-300 px-3 py-2">
-                    {ins.plenaria}
+                  <td className="border border-gray-300 px-2 py-2 text-center">
+                    <button
+                      className="px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-800"
+                      onClick={() => {
+                        setSelectedInscripcion(ins);
+                        setModalVerOpen(true);
+                      }}
+                    >
+                      Ver
+                    </button>
                   </td>
 
-                  <td className="border border-gray-300 px-3 py-2 text-center">
+                  <td className="border border-gray-300 px-2 py-2 text-center">
                     <button
                       className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                       onClick={() => openModal(ins)}
                     >
-                      Marcar ingreso
+                      Ingreso
                     </button>
                   </td>
 
-                  <td className="border border-gray-300 px-3 py-2 text-center">
+                  <td className="border border-gray-300 px-2 py-2 text-center">
+                    <button
+                      className="px-2 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+                      onClick={() => openModalPago(ins)}
+                    >
+                      Pago
+                      {typeof ins.pago === "number" && ins.pago > 0
+                        ? ` $${ins.pago}`
+                        : ""}
+                    </button>
+                  </td>
+
+                  <td className="border border-gray-300 px-2 py-2 text-center">
                     <button
                       className={`px-2 py-1 rounded text-white ${
                         ins.salio
                           ? "bg-gray-500 hover:bg-gray-600"
                           : "bg-red-500 hover:bg-red-600"
                       }`}
-                      onClick={() =>
-                        toggleSalida(ins.id, ins.nombre_chico, !!ins.salio)
-                      }
+                      onClick={() => openModalSalida(ins)}
                     >
-                      {ins.salio ? "Cancelar salida" : "Marcar salida"}
+                      {ins.salio ? "Cancelar" : "Salida"}
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={9} className="text-center py-4 text-gray-500">
+                <td colSpan={7} className="text-center py-4 text-gray-500">
                   No se encontraron inscripciones
                 </td>
               </tr>
@@ -448,6 +549,170 @@ const Entrada: React.FC = () => {
                 onClick={confirmarIngreso}
               >
                 Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalPagoOpen && selectedInscripcion && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-2xl font-bold mb-4">
+              Registrar pago de: {selectedInscripcion.nombre_chico}
+            </h2>
+
+            <div className="mb-4 text-xl">
+              {plenariasModal.map((num) => (
+                <label
+                  key={num}
+                  className="flex items-center mb-2 cursor-pointer p-[5px] transform transition duration-300 hover:scale-105 hover:bg-gray-300"
+                >
+                  <input
+                    type="checkbox"
+                    className="mr-2 cursor-pointer"
+                    checked={plenariasPagadas.includes(num)}
+                    onChange={() => togglePlenariaPagada(num)}
+                  />
+                  Plenaria {num}
+                </label>
+              ))}
+            </div>
+
+            <p className="text-xl font-semibold mb-4">
+              Total: ${plenariasPagadas.length * PRECIO_PLENARIA}
+            </p>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 bg-red-600 rounded text-white transform transition-transform duration-300 hover:scale-105"
+                onClick={() => setModalPagoOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-600 transform transition-transform duration-300 hover:scale-105"
+                onClick={confirmarPago}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalSalidaOpen && selectedInscripcion && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-2xl font-bold mb-4">
+              {selectedInscripcion.salio ? "Cancelar salida" : "Marcar salida"}
+            </h2>
+
+            <p className="mb-4 text-lg">
+              ¿Seguro que querés marcar a{" "}
+              <b>
+                {selectedInscripcion.apellido_chico}{" "}
+                {selectedInscripcion.nombre_chico}
+              </b>{" "}
+              como {selectedInscripcion.salio ? "NO salió" : "SALIDO"}?
+            </p>
+
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 bg-red-600 rounded text-white"
+                onClick={() => {
+                  setModalSalidaOpen(false);
+                  setSelectedInscripcion(null);
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded"
+                onClick={confirmarSalida}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalVerOpen && selectedInscripcion && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-2xl font-bold mb-4">
+              {selectedInscripcion.apellido_chico}{" "}
+              {selectedInscripcion.nombre_chico}
+            </h2>
+
+            <div className="mb-4 text-lg space-y-2">
+              <p>
+                <b>Condición médica:</b>{" "}
+                {selectedInscripcion.condicion_medica
+                  ? selectedInscripcion.detalle_condicion || "Sí"
+                  : "No"}
+              </p>
+              <p>
+                <b>Responsable:</b> {selectedInscripcion.apellido_responsable}{" "}
+                {selectedInscripcion.nombre_responsable}
+              </p>
+              <p>
+                <b>Celular:</b> {selectedInscripcion.celular_responsable}
+              </p>
+              <p>
+                <b>Plenaria:</b> {selectedInscripcion.plenaria}
+              </p>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-gray-700 rounded text-white"
+                onClick={() => {
+                  setModalVerOpen(false);
+                  setSelectedInscripcion(null);
+                }}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalNombreOpen && selectedInscripcion && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h2 className="text-2xl font-bold mb-4">Editar nombre</h2>
+
+            <label className="block mb-1">Apellido</label>
+            <input
+              type="text"
+              value={nuevoApellido}
+              onChange={(e) => setNuevoApellido(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 w-full mb-3"
+            />
+
+            <label className="block mb-1">Nombre</label>
+            <input
+              type="text"
+              value={nuevoNombre}
+              onChange={(e) => setNuevoNombre(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-2 w-full mb-4"
+            />
+
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-4 py-2 bg-red-600 rounded text-white"
+                onClick={() => setModalNombreOpen(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded"
+                onClick={guardarNombre}
+              >
+                Guardar
               </button>
             </div>
           </div>
